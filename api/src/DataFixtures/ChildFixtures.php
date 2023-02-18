@@ -24,15 +24,15 @@ class ChildFixtures extends Fixture implements DependentFixtureInterface
 
     public function load(ObjectManager $manager): void
     {
-        foreach(self::CHILDREN as $c) {
+        foreach(self::CHILDREN as $children) {
             $child = new Child();
-            $child->setName($c['name']);
-            $child->setSurname($c['surname']);
-            $child->setArchived($c['archived']);
+            $child->setName($children['name']);
+            $child->setSurname($children['surname']);
+            $child->setArchived($children['archived']);
 
-            $this->addReference($c['name'], $child);
+            $this->addReference($children['name'], $child);
 
-            $child->setRoom($this->getReference($c['room']));
+            $child->setRoom($this->getReference($children['room']));
 
             $manager->persist($child);
         }
