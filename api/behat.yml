@@ -1,0 +1,11 @@
+default:
+    suites:
+        default:
+            contexts:
+                - FeatureContext
+    extensions:
+        Imbo\BehatApiExtension:
+            apiClient:
+                base_uri: http://api:80
+                timeout: 30.0
+                verify: false

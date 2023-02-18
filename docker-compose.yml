@@ -1,0 +1,57 @@
+version: "3.4"
+
+services:
+    php:
+        build:
+            context: ./api
+            target: api_platform_php
+        depends_on:
+            - database
+        links:
+            - database
+        restart: unless-stopped
+        env_file:
+            - ./api/.env
+        volumes:
+            - ./api:/srv/api:rw
+        healthcheck:
+            test: [ "CMD-SHELL", "netstat -an | grep :9000 || exit 1" ]
+            interval: 10s
+            timeout: 3s
+            retries: 3
+            start_period: 10s
+
+    api:
+        build:
+            context: api/
+            target: api_platform_nginx
+        links:
+            - php
+        volumes:
+            - ./api/public:/srv/api/public:ro
+        ports:
+            -   target: 80
+                published: 8085
+                protocol: tcp
+        restart: unless-stopped
+        healthcheck:
+            test: [ "CMD-SHELL", "netstat -an | grep :80 || exit 1" ]
+            interval: 10s
+            timeout: 3s
+            retries: 3
+            start_period: 10s
+
+    database:
+        image: mysql:8.0.26
+        environment:
+            MYSQL_ROOT_PASSWORD: blossom
+            MYSQL_DATABASE: blossom
+        ports:
+            -   target: 3306
+                published: 3385
+                protocol: tcp
+        volumes:
+            - db-data:/var/lib/mysql:rw
+
+volumes:
+    db-data:
